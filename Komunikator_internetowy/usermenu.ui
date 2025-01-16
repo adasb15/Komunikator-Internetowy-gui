@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>Usermenu</class>
+ <widget class="QMainWindow" name="Usermenu">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>800</width>
+    <height>600</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Menu użytkownika</string>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <widget class="QPushButton" name="add_friend_button">
+    <property name="geometry">
+     <rect>
+      <x>260</x>
+      <y>70</y>
+      <width>261</width>
+      <height>51</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Dodaj znajomego</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="view_friend_button">
+    <property name="geometry">
+     <rect>
+      <x>260</x>
+      <y>210</y>
+      <width>261</width>
+      <height>51</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Wyświetl znajomych</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="remove_friend_button">
+    <property name="geometry">
+     <rect>
+      <x>260</x>
+      <y>140</y>
+      <width>261</width>
+      <height>51</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Usuń znajomego</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="text_lebel">
+    <property name="geometry">
+     <rect>
+      <x>150</x>
+      <y>20</y>
+      <width>481</width>
+      <height>41</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignmentFlag::AlignCenter</set>
+    </property>
+   </widget>
+   <widget class="QLabel" name="text_lebel_2">
+    <property name="geometry">
+     <rect>
+      <x>130</x>
+      <y>350</y>
+      <width>501</width>
+      <height>221</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignmentFlag::AlignCenter</set>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="message_button">
+    <property name="geometry">
+     <rect>
+      <x>260</x>
+      <y>280</y>
+      <width>261</width>
+      <height>51</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Menu wiadomości</string>
+    </property>
+   </widget>
+  </widget>
+  <widget class="QMenuBar" name="menubar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>800</width>
+     <height>23</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="QStatusBar" name="statusbar"/>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

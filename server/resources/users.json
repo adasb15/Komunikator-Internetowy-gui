@@ -1,0 +1,42 @@
+[
+    {
+        "friends": [
+            "adasb15",
+            "gui",
+            "nowy"
+        ],
+        "id": 4,
+        "password": "4",
+        "username": "acc4"
+    },
+    {
+        "friends": [
+            "adasb15",
+            "gui",
+            "acc4"
+        ],
+        "id": 2,
+        "password": "12",
+        "username": "nowy"
+    },
+    {
+        "friends": [
+            "nowy",
+            "gui",
+            "acc4"
+        ],
+        "id": 1,
+        "password": "1234",
+        "username": "adasb15"
+    },
+    {
+        "friends": [
+            "adasb15",
+            "nowy",
+            "acc4"
+        ],
+        "id": 3,
+        "password": "gui",
+        "username": "gui"
+    }
+]

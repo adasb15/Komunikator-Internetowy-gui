@@ -1,0 +1,9 @@
+/home/adasb15/Komunikator_internetowy/build/Desktop_Qt_6_8_1-Debug/CMakeFiles/Komunikator_internetowy.dir
+/home/adasb15/Komunikator_internetowy/build/Desktop_Qt_6_8_1-Debug/CMakeFiles/edit_cache.dir
+/home/adasb15/Komunikator_internetowy/build/Desktop_Qt_6_8_1-Debug/CMakeFiles/rebuild_cache.dir
+/home/adasb15/Komunikator_internetowy/build/Desktop_Qt_6_8_1-Debug/CMakeFiles/list_install_components.dir
+/home/adasb15/Komunikator_internetowy/build/Desktop_Qt_6_8_1-Debug/CMakeFiles/install.dir
+/home/adasb15/Komunikator_internetowy/build/Desktop_Qt_6_8_1-Debug/CMakeFiles/install/local.dir
+/home/adasb15/Komunikator_internetowy/build/Desktop_Qt_6_8_1-Debug/CMakeFiles/install/strip.dir
+/home/adasb15/Komunikator_internetowy/build/Desktop_Qt_6_8_1-Debug/CMakeFiles/Komunikator_internetowy_autogen_timestamp_deps.dir
+/home/adasb15/Komunikator_internetowy/build/Desktop_Qt_6_8_1-Debug/CMakeFiles/Komunikator_internetowy_autogen.dir
