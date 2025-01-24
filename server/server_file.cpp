@@ -138,7 +138,6 @@ void loadConversationsFromFile() {
 
                     strncpy(msg.content, msgJson["content"].get<std::string>().c_str(), sizeof(msg.content) - 1);
                     msg.content[sizeof(msg.content) - 1] = '\0';
-
                     conversation.messages.push_back(msg);
                 }
             }

@@ -262,25 +262,25 @@ void handleSendMessage(int conversationId, struct Message request) {
                 sa.sin_family = AF_INET;
                 sa.sin_port = htons(PORT + conversationId + userId);
 
+                std::cout << PORT + conversationId + userId << std::endl;
+
                 if (inet_pton(AF_INET, "127.0.0.1", &sa.sin_addr) <= 0) {
                     std::cerr << "Nieprawidłowy adres IP.\n";
                     return;
                 }
+
+                sleep(0.5);
 
                 if (connect(clientConv, (struct sockaddr*)&sa, sizeof(sa)) < 0) {
                     std::cerr << "Błąd połączenia z serwerem.\n";
                     continue;
                 }
 
-                int messageCount = conv.messages.size();
-            
-                // Wyślij liczbę wiadomości w historii
-                send(clientConv, &messageCount, sizeof(messageCount), MSG_DONTWAIT);
+                Message new_msg;
+                memset(&new_msg, 0, sizeof(sa));
+                new_msg = conv.messages.back();   // Pobranie ostatniej wiadomości
 
-                // Wyślij każdą wiadomość
-                for (const auto& msg : conv.messages) {
-                    send(clientConv, &msg, sizeof(msg), MSG_DONTWAIT);
-                }
+                send(clientConv, &new_msg, sizeof(new_msg), 0);
                 close(clientConv);
             }
             break;
@@ -312,7 +312,7 @@ void handleCreateGroup(int clientSocket, const std::vector<std::string>& friends
             const auto& user1 = friendsNames[i];
             const auto& user2 = friendsNames[j];
 
-            // Znajdujemy użytkownika w mapie `users`
+            // Znajdujemy użytkownika w mapie users
             auto it1 = std::find_if(users.begin(), users.end(),
                                     [&user1](const auto& pair) {
                                         return pair.second.username == user1;
@@ -419,7 +419,7 @@ void handleUserMenu(int clientSocket) {
         std::vector<std::string> friendsNamesVec;
 
         switch (request.option) {
-            case 0:  
+            case -1:
                 std::cout << "Użytkownik się wylogował\n";
                 return;
             case 1: //Obsługa dodania znajomego
@@ -455,8 +455,7 @@ void handleUserMenu(int clientSocket) {
                 handleSendGroupMessage(clientSocket, request.friend_action.userId, request.group_name);
                 break;
             default:
-                std::cout << "Klient wykonał złe polecenie\n";
-                break;
+                continue;
         }
     }
 }
@@ -470,7 +469,7 @@ void handleClient(int clientSocket) {
         }
 
         switch (option) {
-        case 0:
+        case -1:
             activeClient--;
             std::cout << "Liczba aktywnych klientów: " << activeClient << std::endl;
             close(clientSocket);
@@ -482,8 +481,7 @@ void handleClient(int clientSocket) {
             handleLogin(clientSocket);
             break;
         default:
-            std::cerr << "Nieprawidłowe polecenie klienta.\n";
-            break;
+            continue;
         }
     }
 }

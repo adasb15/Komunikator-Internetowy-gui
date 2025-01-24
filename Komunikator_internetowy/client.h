@@ -9,9 +9,9 @@
 #include <iostream>
 #include <string>
 #include <arpa/inet.h>  // Do obsługi socketów
-#include <unistd.h>     // Do operacji na systemie
+#include <unistd.h>     // Do operacji na systemie (np. close)
 #include <sys/socket.h> // Tworzenie socketów
-#include <netinet/in.h> // Struktury dla socketów
+#include <netinet/in.h> // Struktury dla socketów (adresy i porty)
 #include "message.h"
 
 QT_BEGIN_NAMESPACE
@@ -52,7 +52,7 @@ private:
     // Struktura do obsługi akcji związanych z przyjaciółmi
     struct FriendAction {
         int userId;  // ID użytkownika wykonującego akcję
-        char friendUsername[256];  // Nazwa przyjaciela użytkownika
+        char friendUsername[256];  // Nazwa użytkownika przyjaciela
     };
 
     // Struktura do przechowywania wiadomości
@@ -63,12 +63,13 @@ private:
 
     // Struktura wiadomości wysyłanej do serwera
     struct Msg_to_server {
-        int option;  // Opcja działania (np. rejestracja, logowanie, dodawanie przyjaciela)
+        int option = 0;  // Opcja działania (np. rejestracja, logowanie, dodawanie przyjaciela)
         int conversationId = 0;  // ID konwersacji (domyślnie 0)
         struct FriendAction friend_action;  // Działanie związane z przyjacielem
         struct Message_stru message_stru;  // Wiadomość
         char friendsNames[20][256];  // Lista przyjaciół (maksymalnie 20)
         char group_name[256];  // Nazwa grupy (do grupowych wiadomości)
+        std::vector<Message_stru> messagebuf;
     };
 
     Ui::Client *ui;  // Wskaźnik do obiektu UI (interfejsu użytkownika)
@@ -78,8 +79,9 @@ private:
     QString userName;  // Nazwa użytkownika
     QList<Message*> openMessages;  // Lista przechowująca wskaźniki do okien wiadomości
 
+    //const char* SERVER_IP = "192.168.1.10";  // Adres IP serwera
     const char* SERVER_IP = "127.0.0.1";  // Adres IP serwera
-    const int SERVER_PORT = 5000;  // Port serwera
+    const int SERVER_PORT = 4000;  // Port serwera
 
     // Funkcje pomocnicze
     void Login(const QString &username, const QString &password);  // Funkcja logowania

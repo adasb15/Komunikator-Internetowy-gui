@@ -86,7 +86,7 @@ int findOrCreateConversation(int senderId, const std::vector<std::string>& parti
             const auto& user1 = allParticipants[i];
             const auto& user2 = allParticipants[j];
 
-            // Znajdujemy użytkownika w mapie `users`
+            // Znajdujemy użytkownika w mapie users
             auto it1 = std::find_if(users.begin(), users.end(),
                                     [&user1](const auto& pair) {
                                         return pair.second.username == user1;
@@ -159,11 +159,29 @@ void handleSendPrivateMessage(int clientSocket, struct FriendAction request) {
             // Wyślij liczbę wiadomości w historii
             send(clientSocket, &messageCount, sizeof(messageCount), 0);
 
-            // Wyślij każdą wiadomość
-            for (const auto& msg : conv.messages) {
-                send(clientSocket, &msg, sizeof(msg), 0);
+            sleep(0.5);
+
+            if (messageCount > 0) {
+                // Oblicz rozmiar bufora
+                size_t bufferSize = messageCount * sizeof(Message);
+
+                // Pobierz wskaźnik do danych wektora (unikamy niepotrzebnego kopiowania)
+
+                for (const auto& msg : conv.messages) {
+                    std::cout << msg.senderUsername << " " << msg.content << std::endl;
+                }
+
+                const char* buffer = reinterpret_cast<const char*>(conv.messages.data());
+
+                // Wyślij cały bufor w jednej operacji
+                ssize_t sentBytes = send(clientSocket, buffer, bufferSize, 0);
+                if (sentBytes == -1) {
+                    perror("Błąd wysyłania wiadomości");
+                    break;
+                }
+
+                std::cout << "Wysłano " << messageCount << " wiadomości (rozmiar: " << bufferSize << " bajtów)" << std::endl;
             }
-            break;
         }
     }
 }
@@ -178,8 +196,7 @@ void handleSendGroupMessage(int clientSocket, int userId, const std::string& gro
     if (conversationId == -1) { // Nie udało się znaleźć lub utworzyć konwersacji
         return;
     }
-    
-    //TODO TUTAJ DODAJ PRZESYŁANIE HISTORII TEJ KONWERSACJI
+
     for (const auto& conv : conversations) {
         if (conv.conversationId == conversationId) {
             int messageCount = conv.messages.size();
@@ -187,12 +204,29 @@ void handleSendGroupMessage(int clientSocket, int userId, const std::string& gro
             // Wyślij liczbę wiadomości w historii
             send(clientSocket, &messageCount, sizeof(messageCount), 0);
 
-            // Wyślij każdą wiadomość
-            for (const auto& msg : conv.messages) {
-                send(clientSocket, &msg, sizeof(msg), 0);
-            }
+            sleep(0.5);
 
-            break;
+            if (messageCount > 0) {
+                // Oblicz rozmiar bufora
+                size_t bufferSize = messageCount * sizeof(Message);
+
+                // Pobierz wskaźnik do danych wektora (unikamy niepotrzebnego kopiowania)
+
+                for (const auto& msg : conv.messages) {
+                    std::cout << msg.senderUsername << " " << msg.content << std::endl;
+                }
+
+                const char* buffer = reinterpret_cast<const char*>(conv.messages.data());
+
+                // Wyślij cały bufor w jednej operacji
+                ssize_t sentBytes = send(clientSocket, buffer, bufferSize, 0);
+                if (sentBytes == -1) {
+                    perror("Błąd wysyłania wiadomości");
+                    break;
+                }
+
+                std::cout << "Wysłano " << messageCount << " wiadomości (rozmiar: " << bufferSize << " bajtów)" << std::endl;
+            }
         }
     }
 }

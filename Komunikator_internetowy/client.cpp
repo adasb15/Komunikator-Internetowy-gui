@@ -123,11 +123,11 @@ void Client::Login(const QString &username, const QString &password) {
 
 // Funkcja wylogowania i zamknięcia połączenia
 void Client::Leave_server() {
-    int option = 0; // Opcja wylogowania
     if (userId > 0) {
         // Wysłanie opcji wylogowania
+        int option = -1; // Opcja wylogowania
         if (send(clientSocket, &option, sizeof(option), 0) < 0){
-            std::cerr << "Błąd podczas wysyłania wiadomości do serwera serwera.\n";
+            std::cerr << "Błąd podczas wysyłania wiadomości do serwera.\n";
         }
 
         // Zamykanie wszystkich okien wiadomości
@@ -139,7 +139,10 @@ void Client::Leave_server() {
     sleep(0.2);
 
     // Zamknięcie połączenia
-    if (send(clientSocket, &option, sizeof(option), 0) < 0){
+    Msg_to_server request;
+    request.option = -1;
+
+    if (send(clientSocket, &request, sizeof(request), 0) < 0){
         std::cerr << "Błąd podczas zamykania klienta.\n";
     }
 
@@ -272,9 +275,10 @@ void Client::on_view_friend_button_clicked()
 
 void Client::on_logout_button_clicked()
 {
-    int option = 0;  // Opcja wylogowania
+    Msg_to_server request;
+    request.option = -1;  // Opcja wylogowania
     if (userId > 0) {  // Jeśli użytkownik jest zalogowany
-        if (send(clientSocket, &option, sizeof(option), 0) < 0) {  // Wysyłamy prośbę o wylogowanie
+        if (send(clientSocket, &request, sizeof(request), 0) < 0) {  // Wysyłamy prośbę o wylogowanie
             std::cerr << "Błąd podczas wysyłania wiadomości do serwera serwera.\n";
         }
         ui->stackedWidget->setCurrentIndex(0); // Powrót do logowania

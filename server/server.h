@@ -19,7 +19,7 @@
 #include "resources/json.hpp"
 
 // Stałe
-const int PORT = 5000;  // Port serwera
+const int PORT = 4000;  // Port serwera
 
 // Struktury używane do przechowywania danych użytkowników, wiadomości i rozmów
 struct User {
@@ -53,7 +53,7 @@ struct Conversation {
 };
 
 struct Msg_to_server {
-    int option;
+    int option = 0;
     int conversationId = 0;
     struct FriendAction friend_action;
     struct Message message;

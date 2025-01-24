@@ -15,13 +15,13 @@
 #include <netinet/in.h> // Struktury do adresów i portów w sieci
 
 namespace Ui {
-class Message;
+class Message;  // Forward declaration klasy UI dla Message
 }
 
 // Klasa Message dziedziczy po QMainWindow, odpowiada za interfejs wiadomości
 class Message : public QMainWindow
 {
-    Q_OBJECT
+    Q_OBJECT  // Makro umożliwiające integrację z mechanizmem sygnałów i slotów Qt
 
 public:
     // Konstruktor klasy Message
@@ -42,29 +42,32 @@ private:
 
     // Struktura przechowująca dane wiadomości (np. nadawca, treść)
     struct Message_stru {
-        char senderUsername[256];  // Nazwa nadawcy wiadomości
-        char content[1024];        // Treść wiadomości
+        char senderUsername[256] = {};  // Nazwa nadawcy wiadomości
+        char content[1024] = {};        // Treść wiadomości
     };
 
     // Struktura wiadomości wysyłanej do serwera (np. akcje przyjaciół, wiadomości)
     struct Msg_to_server {
-        int option;  // Opcja określająca rodzaj akcji (np. wysyłanie wiadomości)
+        int option = 0;  // Opcja określająca rodzaj akcji (np. wysyłanie wiadomości)
         int conversationId = 0;  // ID rozmowy (domyślnie 0)
         struct FriendAction friend_action;  // Akcja związana z przyjacielem
         struct Message_stru message_stru;  // Wiadomość
         char friendsNames[20][256];  // Lista przyjaciół
         char group_name[256];  // Nazwa grupy (do obsługi grupowych wiadomości)
+        std::vector<Message_stru> messagebuf;
     };
 
     QThread *workerThread;  // Wskaźnik na wątek, który będzie obsługiwał komunikację z serwerem
 
+    //const char* SERVER_IP = "192.168.1.10";  // Adres IP serwera
     const char* SERVER_IP = "127.0.0.1";  // Adres IP serwera
-    const int SERVER_PORT = 5000;         // Port serwera, na którym działa aplikacja
+    const int SERVER_PORT = 4000;         // Port serwera, na którym działa aplikacja
 
     Ui::Message *ui;  // Wskaźnik na obiekt UI (interfejs użytkownika)
     int clientSocket;  // Gniazdo do komunikacji z serwerem
     int userId;        // ID użytkownika, uzyskane po zalogowaniu
     int conversationId; // ID konwersacji (dla wiadomości)
+    int convSocket;
     QString userName;  // Nazwa użytkownika
     QString text;      // Przechowywanie tekstu (np. wiadomości do wysłania)
 

@@ -1,0 +1,2 @@
+set(__QT_DEPLOY_TARGET_Komunikator_internetowy_FILE /home/adasb15/Komunikator_internetowy/build/Desktop_Qt_6_8_1-Debug/Komunikator_internetowy)
+set(__QT_DEPLOY_TARGET_Komunikator_internetowy_TYPE EXECUTABLE)

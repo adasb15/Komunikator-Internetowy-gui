@@ -15,70 +15,71 @@ Message::Message(int clientSocket, int userId, int conversationId, QString usern
 
     // Tworzenie nowego wątku
     workerThread = QThread::create([this, conversationId, userId]() {
+        qDebug() << "Rozpoczynam działanie wątku dla rozmowy ID:" << conversationId << "i użytkownika ID:" << userId;
+
         int ConvSocket = socket(PF_INET, SOCK_STREAM, 0);  // Tworzenie gniazda dla nowego połączenia
         if (ConvSocket < 0) {
-            std::cerr << "Błąd tworzenia gniazda!";
+            qDebug() << "Błąd tworzenia gniazda!";
             return;
         }
 
         struct sockaddr_in sa;
-        sa.sin_addr.s_addr = htonl(INADDR_ANY);  // Adres IP
+        sa.sin_addr.s_addr = INADDR_ANY;  // Adres IP
         sa.sin_family = AF_INET;  // Rodzina adresów
         sa.sin_port = htons(SERVER_PORT + conversationId + userId);  // Ustalamy port na podstawie ID konwersacji i użytkownika
 
+        // Ustawienie opcji SO_REUSEADDR przed bind
+        int opt = 1;
+        if (setsockopt(ConvSocket, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt)) < 0) {
+            qDebug() << "Błąd ustawiania opcji SO_REUSEADDR!";
+            ::close(ConvSocket);
+            return;
+        }
+
         if (::bind(ConvSocket, (struct sockaddr *)&sa, sizeof(sa)) < 0) {  // Wiązanie gniazda
-            std::cerr << "Błąd wiązania gniazda!";
+            std::cerr << "Błąd wiązania gniazda!\n";
             return;
         }
 
         if (listen(ConvSocket, 10) < 0) {  // Nasłuchiwanie na gnieździe
-            std::cerr << "Błąd nasłuchiwania na gnieździe!";
+            std::cerr << "Błąd nasłuchiwania na gnieździe!\n";
             return;
         }
 
-        while (true) {
+        qDebug() << SERVER_PORT + conversationId + userId;
+        convSocket = ConvSocket;
+
+        while (this->isVisible()) {  // Kontynuuj tylko, jeśli okno jest widoczne
             int serwersocket = accept(ConvSocket, nullptr, nullptr);  // Akceptacja połączenia
             if (serwersocket < 0) {
                 std::cerr << "Błąd akceptacji połączenia!";
-                return;
-            }
-            int messageCount;
-            // Odbierz liczbę wiadomości
-            if (recv(serwersocket, &messageCount, sizeof(messageCount), 0) < 0) {
-                std::cerr << "Błąd odbierania liczby wiadomości.";
-                return;
+                break;  // Przerywamy pętlę, jeśli błąd
             }
 
             QString buff;
-            // Odbieramy każdą wiadomość
-            for (int i = 0; i < messageCount; ++i) {
-                Message_stru msg;
-                if (recv(serwersocket, &msg, sizeof(msg), 0) < 0) {  // Odbieranie pojedynczej wiadomości
-                    std::cerr << "Błąd odbierania wiadomości nr:" << (i + 1);
-                    return;
-                }
-
-                QString sender = QString::fromUtf8(msg.senderUsername);  // Odbieranie nazwy nadawcy
-                QString content = QString::fromUtf8(msg.content);  // Odbieranie treści wiadomości
-
-                buff.append(QString("%1: %2\n").arg(sender, content));  // Tworzenie bufora z wiadomościami
+            // Odbieramy ostatnią wiadomość
+            Message_stru msg;
+            if (recv(serwersocket, &msg, sizeof(msg), 0) < 0) {  // Odbieranie pojedynczej wiadomości
+                std::cerr << "Błąd odbierania wiadomości\n";
+                break;
             }
+
+            QString sender = QString::fromUtf8(msg.senderUsername);  // Odbieranie nazwy nadawcy
+            QString content = QString::fromUtf8(msg.content);  // Odbieranie treści wiadomości
+
+            buff.append(QString("%1: %2").arg(sender, content));  // Tworzenie bufora z wiadomościami
 
             // Dodaj wiadomość do widoku tekstowego
             QMetaObject::invokeMethod(this, [this, buff]() {
-                ui->textEdit->clear();  // Wyczyść widok wiadomości
-                ui->textEdit->append(buff);  // Dodaj nowe wiadomości
+                ui->textEdit->append(buff);  // Dodaj nową wiadomość
                 ui->textEdit->moveCursor(QTextCursor::End);  // Przewiń widok na dół
             });
 
-            // Zatrzymaj wątek, jeśli okno zostało zamknięte
-            if (this->isVisible() == false) {
-                ::close(serwersocket);  // Zamknięcie gniazda serwera
-                break;
-            }
+            ::close(serwersocket);  // Zamknięcie gniazda po przetworzeniu wiadomości
         }
 
         ::close(ConvSocket);  // Zamknięcie gniazda konwersacji
+        qDebug() << "Wątek zakończył działanie.";
     });
 
     // Uruchom wątek
@@ -88,11 +89,13 @@ Message::Message(int clientSocket, int userId, int conversationId, QString usern
 // Destruktor klasy Message
 Message::~Message()
 {
-    delete ui;  // Usuwanie UI
-    // Metoda, która wywoływana jest przy zamknięciu okna
+    // Zatrzymywanie wątku i zamykanie gniazd
     workerThread->quit();  // Zakończenie wątku
     workerThread->wait();  // Czekaj na zakończenie wątku
+    ::close(convSocket);
+    delete ui;  // Usuwanie UI
 }
+
 
 // Metoda do obsługi zmian wprowadzanych w polu tekstowym
 void Message::on_lineEdit_textChanged(const QString &arg1)
@@ -145,20 +148,31 @@ void Message::loadHistory()
 
     QString buff;
 
-    // Odbierz każdą wiadomość
-    for (int i = 0; i < messageCount; ++i) {
-        Message_stru msg;
-        if (recv(clientSocket, &msg, sizeof(msg), 0) < 0) {  // Odbieranie wiadomości
+    if (messageCount > 0) {
+        size_t bufSize = messageCount * sizeof(Message_stru);
+        std::vector<Message_stru> messages(messageCount);
+
+                    qDebug() << "dupa";
+
+        if (recv(clientSocket, messages.data(), bufSize, 0) < 0) {  // Odbieranie wiadomości
             std::cerr << "Błąd odbierania wiadomości.\n";
             return;
         }
+                    qDebug() << "dupa2";
 
-        QString sender = QString::fromUtf8(msg.senderUsername);  // Odbieranie nazwy nadawcy
-        QString content = QString::fromUtf8(msg.content);  // Odbieranie treści wiadomości
+        // Wyświetl wszystkie wiadomości
+        for (auto& msg : messages) {
+            QString sender = QString::fromStdString(msg.senderUsername);
+            QString content = QString::fromStdString(msg.content);
 
-        buff.append(QString("%1: %2\n").arg(sender, content));  // Tworzenie bufora z wiadomościami
+            qDebug() << sender;
+            qDebug() << content;
+            buff.append(QString("%1: %2\n").arg(sender, content));  // Tworzenie bufora z wiadomościami
+        }
     }
+
     // Dodaj wiadomość do widoku tekstowego
     ui->textEdit->setText(buff);  // Ustawienie wiadomości w widoku
     ui->textEdit->moveCursor(QTextCursor::End);  // Przewiń widok na dół
 }
+
