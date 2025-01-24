@@ -152,21 +152,15 @@ void Message::loadHistory()
         size_t bufSize = messageCount * sizeof(Message_stru);
         std::vector<Message_stru> messages(messageCount);
 
-                    qDebug() << "dupa";
-
         if (recv(clientSocket, messages.data(), bufSize, 0) < 0) {  // Odbieranie wiadomości
             std::cerr << "Błąd odbierania wiadomości.\n";
             return;
         }
-                    qDebug() << "dupa2";
 
         // Wyświetl wszystkie wiadomości
         for (auto& msg : messages) {
             QString sender = QString::fromStdString(msg.senderUsername);
             QString content = QString::fromStdString(msg.content);
-
-            qDebug() << sender;
-            qDebug() << content;
             buff.append(QString("%1: %2\n").arg(sender, content));  // Tworzenie bufora z wiadomościami
         }
     }
