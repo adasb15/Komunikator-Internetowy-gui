@@ -166,11 +166,6 @@ void handleSendPrivateMessage(int clientSocket, struct FriendAction request) {
                 size_t bufferSize = messageCount * sizeof(Message);
 
                 // Pobierz wskaźnik do danych wektora (unikamy niepotrzebnego kopiowania)
-
-                for (const auto& msg : conv.messages) {
-                    std::cout << msg.senderUsername << " " << msg.content << std::endl;
-                }
-
                 const char* buffer = reinterpret_cast<const char*>(conv.messages.data());
 
                 // Wyślij cały bufor w jednej operacji
@@ -211,11 +206,6 @@ void handleSendGroupMessage(int clientSocket, int userId, const std::string& gro
                 size_t bufferSize = messageCount * sizeof(Message);
 
                 // Pobierz wskaźnik do danych wektora (unikamy niepotrzebnego kopiowania)
-
-                for (const auto& msg : conv.messages) {
-                    std::cout << msg.senderUsername << " " << msg.content << std::endl;
-                }
-
                 const char* buffer = reinterpret_cast<const char*>(conv.messages.data());
 
                 // Wyślij cały bufor w jednej operacji
